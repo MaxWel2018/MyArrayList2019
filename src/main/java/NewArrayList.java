@@ -113,7 +113,7 @@ public class NewArrayList<T> implements List {
 
     @Override
     public boolean addAll(Collection c) {
-        if (c.size() <= (this.capacity - this.size)) { //  more free space than added items
+        if (c.size() <= freeSpace(this.capacity, this.size)) { //  more free space than added items
 
             for (Object o : c) {
                 array[size++] = (T) o;
@@ -138,7 +138,7 @@ public class NewArrayList<T> implements List {
     @Override
     public boolean addAll(int index, Collection c) {
 
-        if ((this.capacity - this.size) > (c.size() - index)) {  //  more free space than added items
+        if ((freeSpace(this.capacity, this.size)) >= (numberOfItemsAdded(index, c.size()))) {  //  more free space than added items
             int temp = 0;
             for (Object o : c) {
                 temp++;
@@ -150,7 +150,7 @@ public class NewArrayList<T> implements List {
             }
         } else {
             T tempArray = (T) this.array;
-            array = (T[]) new Object[(c.size() + (c.size() - index)) + 1];//
+            array = (T[]) new Object[(c.size() + numberOfItemsAdded(index, c.size())) + 1];//
             log.info("Capacity increased");
             array = (T[]) tempArray;
             addAll(index, c);
@@ -159,8 +159,16 @@ public class NewArrayList<T> implements List {
         return false;
     }
 
+    private int numberOfItemsAdded(int index, int size) {
+        return size - index;
+    }
+
     @Override
     public void clear() {
+        for (int i = 0; i < size; i++)
+            this.array[i] = null;
+
+        this.size = 0;
 
     }
 
@@ -227,5 +235,9 @@ public class NewArrayList<T> implements List {
     @Override
     public Object[] toArray(Object[] a) {
         return new Object[0];
+    }
+
+    private int freeSpace(int p, int p2) {
+        return p - p2;
     }
 }
